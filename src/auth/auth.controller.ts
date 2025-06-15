@@ -11,6 +11,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import RefreshTokenDto from './dto/refresh.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -21,7 +22,7 @@ export class AuthController {
 
   @Post('/register')
   async register(@Body() body: CreateUserDto) {
-    return this.userService.createUser(body);
+    return await this.userService.createUser(body);
   }
 
   @UseGuards(LocalAuthGuard)
@@ -36,5 +37,11 @@ export class AuthController {
   async getProfile(@Request() req) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     return await this.userService.getUserById(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/refresh-token')
+  async refreshToken(@Body() body: RefreshTokenDto) {
+    return await this.authService.refreshToken(body);
   }
 }
